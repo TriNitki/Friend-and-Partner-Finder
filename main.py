@@ -18,9 +18,6 @@ class User:
 
 @bot.message_handler(content_types=['text'])
 def start(message):
-    global connect
-    global cursor
-    global user
     connect = sqlite3.connect('users.sqlite3')
     cursor = connect.cursor()
     user = User(message.chat.id)
