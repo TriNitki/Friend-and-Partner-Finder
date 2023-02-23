@@ -1,3 +1,4 @@
 tg_env/
-vvenv
+.env
 .idea
+vvenv

@@ -1,8 +1,12 @@
 import telebot
 import sqlite3
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 #bot
-bot = telebot.TeleBot("<bot token>")
+bot_token = os.getenv("bot_token")
+bot = telebot.TeleBot(bot_token)
 
 class User:
     def __init__(self, id, first_name = None, second_name = None, age = None, sex = None) -> None:
@@ -18,7 +22,7 @@ class User:
 
 @bot.message_handler(content_types=['text'])
 def start(message):
-    connect = sqlite3.connect('users.sqlite3')
+    connect = sqlite3.connect('users.sqlite3', check_same_thread=False)
     cursor = connect.cursor()
     user = User(message.chat.id)
     cursor.execute("""CREATE TABLE IF NOT EXISTS login_id(
@@ -43,7 +47,7 @@ def start(message):
     def first_name(message):
         user.first_name = message.text
         bot.send_message(message.chat.id, 'Какая у тебя фамилия?')
-        bot.register_next_step_handler(message, second_name)    
+        bot.register_next_step_handler(message, second_name) 
 
     def second_name(message):
         user.second_name = message.text
