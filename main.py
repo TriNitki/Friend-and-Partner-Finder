@@ -108,12 +108,11 @@ def start(message):
     
 
 def year_type(age):
-    ages = [2, 3, 4]
-    if ((age % 100) >= 11) and ((age % 100) <= 14):
+    if (age % 100 >= 11) and (age % 100 <= 14):
         return 'лет'
     elif age % 10 == 1:
         return 'год'
-    elif age % 10 in ages:
+    elif age % 10 in [2, 3, 4]:
         return 'года'
     else:
         return 'лет'
