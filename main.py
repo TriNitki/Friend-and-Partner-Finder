@@ -40,14 +40,14 @@ def main(message):
     )""")
     connect.commit()
 
-    cursor.execute(f"SELECT id FROM login_id WHERE id = {user.id}")
+    cursor.execute(f"SELECT id FROM login_id WHERE id = {message.chat.id}")
     data = cursor.fetchone()
 
     '''User commands'''
     if message.text == "/start":
         # greet mew user
         bot.send_message(message.chat.id, f'Привет, {message.chat.username}👋!\
-                         \nДобро пожаловать в "DetectyBot"! Этот бот создан для поиска друзей и бизнес партнеров.')
+                         \nДобро пожаловать в "DetectlyBot"! Этот бот создан для поиска друзей и бизнес партнеров.')
         bot.send_message(message.chat.id, 'Для начала регистрации введите команду /reg. Для полного списка возможностей введите /help.')
     elif message.text == "/reg":
         #register user if it isn't exist
@@ -60,7 +60,7 @@ def main(message):
         if data == None:
             bot.send_message(message.chat.id, 'Пользователь еще не создан.\nДля регистрации воспользуйтесь командой /reg.')
         else:
-            cursor.execute(f"DELETE FROM login_id WHERE id = {user.id}")
+            cursor.execute(f"DELETE FROM login_id WHERE id = {message.chat.id}")
             connect.commit()
             bot.send_message(message.chat.id, 'Пользователь был удален.\nДля повторной регистрации воспользуйтесь командой /reg.')
     elif message.text == "/me":
@@ -83,7 +83,7 @@ def main(message):
         bot.send_message(message.chat.id, 'Не понял.\nДля начала регистрации введите команду /start.')
     
 def greet_user(message):
-    cursor.execute(f"SELECT * FROM login_id")
+    cursor.execute(f"SELECT id, first_name, second_name, age, sex FROM login_id WHERE id = {message.chat.id}")
     id, f_name, s_name, age, sex = cursor.fetchone()
     user = User(id, f_name, s_name, age, sex)
     bot.send_message(message.chat.id, f'Привет, {user.second_name} {user.first_name}. Тебе {user.age} {year_type(user.age)}.')
