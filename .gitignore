@@ -2,3 +2,5 @@ tg_env/
 .env
 .idea
 vvenv
+test.py
+.sqlite3
