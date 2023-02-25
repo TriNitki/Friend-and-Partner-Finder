@@ -1,0 +1,111 @@
+{
+  "sport": {
+    "sport_games": [
+      "volleyball",
+      "football",
+      "basketball",
+      "tennis",
+      "ping_pong",
+      "hockey"
+    ],
+    "gym": [
+      "powerlifting",
+      "fitness",
+      "bodybuilding"
+    ],
+    "outside_sport": [
+      "athletics",
+      "work_out"
+    ]
+  },
+  "programming": [
+    "C++",
+    "Java",
+    "JavaScript",
+    "Ruby",
+    "PHP",
+    "C#",
+    "C",
+    "Go",
+    "1C",
+    "Python"
+  ],
+  "video_games": {
+    "Shooters": [
+      "CSGO",
+      "rainbow_six_siege",
+      "valorant",
+      "battlefield",
+      "call_of_duty"
+    ],
+    "battle_royale": [
+      "pubg",
+      "fortnite",
+      "apex",
+      "call_of_duty_war_zone"
+      ],
+    "single_player": {
+      "rpg": [
+        "skyrim",
+        "the_witcher",
+        "divinity",
+        "project_zomboid",
+        "hogwarts_legacy"
+      ],
+      "souls_like": [
+        "dark_souls",
+        "elden_ring",
+        "bloodborne",
+        "sekiro",
+        "demon_souls"
+      ],
+      "stealth":[
+        "hitman",
+        "assassins_creed",
+        "dishonered",
+        "metal_gear_solid",
+        "batman_arkham"
+      ],
+      "rogue_like": [
+        "rogue_legacy",
+        "graveyard_keeper",
+        "dead_cells",
+        "cuphead",
+        "hollow_knight",
+        "isaac",
+        "enter_the_dungeon"
+      ]
+      },
+    "mobile_games": [
+      "clash_royale",
+      "clash_of_clans",
+      "brawl_stars",
+      "mobile_legends",
+      "subway_surfers",
+      "standoff",
+      "pubg_mobile"
+    ],
+    "moba": [
+      "dota",
+      "lol",
+      "smite",
+      "hots"
+    ],
+    "multi_or_single": {
+      "survival": [
+        "minecraft",
+        "rust",
+        "terraria",
+        "the_forest",
+        "dayz",
+        "ark"
+      ],
+      "races": [
+        "forza_horizon",
+        "need_for_speed",
+        "dirt",
+        "the_crew"
+      ]
+    }
+  }
+}
