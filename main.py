@@ -5,30 +5,40 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class User:
-    def __init__(self, id, first_name = None, second_name = None, age = None, sex = None) -> None:
-        self.id = id
-        self.first_name = first_name
-        self.second_name = second_name
-        self.age = age
-        self.sex = sex
-    
-    def get_data(self):
-        return self.id, self.first_name, self.second_name, self.age, self.sex
-
 #bot
 bot_token = os.getenv("bot_token")
 bot = telebot.TeleBot(bot_token)
 
-#sqlite3
-connect = sqlite3.connect('users.sqlite3', check_same_thread=False)
-cursor = connect.cursor()
+import models
+
+'''BOT COMMANDS'''
+"New user greet"
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.send_message(message.chat.id, f'Привет, {message.chat.username}👋!\
+                    \nДобро пожаловать в "DetectlyBot"! Этот бот создан для поиска друзей и бизнес партнеров.')
+    bot.send_message(message.chat.id, 'Для начала регистрации введите команду /reg. Для полного списка возможностей введите /help.')
 
 
-@bot.message_handler(content_types=['text'])
-def main(message):
-    global user
-    user = User(message.chat.id) # Define user
+"Send full list of available commands"
+@bot.message_handler(commands=['help'])
+def help(message):
+    bot.send_message(message.chat.id,    'Список комманд:')
+    bot.send_message(message.chat.id,    '/start - меню приветствия\
+                                        \n/help - полный список доступных команд\
+                                        \n/reg - начать регистрацию\
+                                        \n/delete - удаление пользователя\
+                                        \n/me - приветствие зарегистрированного пользователя\
+                                        ')
+
+
+"Commands that require db access"
+@bot.message_handler(commands=['reg', 'delete', 'me'])
+def db_req_com(message):
+    global connect, cursor, user
+    connect = sqlite3.connect('users.sqlite3', check_same_thread=False)
+    cursor = connect.cursor()
+    user = models.User(message.chat.id) # Define user
 
     # Create new db if it isn't exist
     cursor.execute("""CREATE TABLE IF NOT EXISTS login_id(
@@ -43,13 +53,7 @@ def main(message):
     cursor.execute(f"SELECT id FROM login_id WHERE id = {message.chat.id}")
     data = cursor.fetchone()
 
-    '''User commands'''
-    if message.text == "/start":
-        # greet mew user
-        bot.send_message(message.chat.id, f'Привет, {message.chat.username}👋!\
-                         \nДобро пожаловать в "DetectlyBot"! Этот бот создан для поиска друзей и бизнес партнеров.')
-        bot.send_message(message.chat.id, 'Для начала регистрации введите команду /reg. Для полного списка возможностей введите /help.')
-    elif message.text == "/reg":
+    if message.text == "/reg":
         #register user if it isn't exist
         if data == None:
             reg_user(message)
@@ -69,23 +73,20 @@ def main(message):
             bot.send_message(message.chat.id, 'Пользователь еще не создан.\nДля регистрации воспользуйтесь командой /reg')
         else:
             greet_user(message)
-    elif message.text == "/help":
-        #send full list of commands
-        bot.send_message(message.chat.id, 'Список комманд:')
-        bot.send_message(message.chat.id, '/start - запуск бота\
-                         \n/help - список комманд\
-                         \n/reg - регистрация\
-                         \n/delete - удаление пользователя\
-                         \n/me - Приветствие\
-                         ')
-    else:
-        bot.reply_to(message, '🤨')
-        bot.send_message(message.chat.id, 'Не понял.\nДля начала регистрации введите команду /start.')
-    
+
+
+"Default bot reply"
+@bot.message_handler(content_types=['text'])
+def non_com(message):
+    bot.reply_to(message, '🤨')
+    bot.send_message(message.chat.id, 'Не понял.\nДля начала регистрации введите команду /start.')
+
+
+'''Functions Used'''
 def greet_user(message):
     cursor.execute(f"SELECT id, first_name, second_name, age, sex FROM login_id WHERE id = {message.chat.id}")
     id, f_name, s_name, age, sex = cursor.fetchone()
-    user = User(id, f_name, s_name, age, sex)
+    user = models.User(id, f_name, s_name, age, sex)
     bot.send_message(message.chat.id, f'Привет, {user.second_name} {user.first_name}. Тебе {user.age} {year_type(user.age)}.')
     
 def reg_user(message):
