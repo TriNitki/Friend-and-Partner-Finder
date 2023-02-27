@@ -28,9 +28,9 @@ def help(message):
     bot.send_message(message.chat.id,    '/start - меню приветствия\
                                         \n/help - полный список доступных команд\
                                         \n/reg - начать регистрацию\
-                                        \n/delete - удаление пользователя\
-                                        \n/me - приветствие зарегистрированного пользователя\
-                                        ')
+                                        \n/edit - редактирование профиля\
+                                        \n/delete - удаление профиля\
+                                        \n/me - приветствие зарегистрированного пользователя')
 
 "Commands that require db access"
 @bot.message_handler(commands=['reg', 'delete', 'me', 'edit'])
