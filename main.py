@@ -11,15 +11,15 @@ bot_token = os.getenv("bot_token")
 bot = telebot.TeleBot(bot_token)
 
 import models
+from func import delete_user, check_city, year_type
 
-'''BOT COMMANDS'''
+'''========BOT==COMMANDS========'''
 "New user greet"
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(message.chat.id, f'Привет, {message.chat.username}👋!\
                     \nДобро пожаловать в "DetectlyBot"! Этот бот создан для поиска друзей и бизнес партнеров.')
     bot.send_message(message.chat.id, 'Для начала регистрации введите команду /reg. Для полного списка возможностей введите /help.')
-
 
 "Send full list of available commands"
 @bot.message_handler(commands=['help'])
@@ -31,7 +31,6 @@ def help(message):
                                         \n/delete - удаление пользователя\
                                         \n/me - приветствие зарегистрированного пользователя\
                                         ')
-
 
 "Commands that require db access"
 @bot.message_handler(commands=['reg', 'delete', 'me', 'edit'])
@@ -89,15 +88,15 @@ def db_req_com(message):
             bot.send_message(message.chat.id, 'И - Имя\nФ - Фамилия\nВ - Возраст\nП - Пол\nГ - Город\nИ - Интересы\nВсе - Изменить все\nН - ничего, я передумал')
             bot.register_next_step_handler(message, edit_profile)
 
-
 "Default bot reply"
 @bot.message_handler(content_types=['text'])
 def non_com(message):
     bot.reply_to(message, '🤨')
     bot.send_message(message.chat.id, 'Не понял.\nДля начала регистрации введите команду /start.')
+'''=============================='''
 
 
-'''Registration'''
+'''=========Registration========='''
 def greet_user(message):
     cursor.execute(f"SELECT id, first_name, second_name, age, sex, city, region, interests FROM login_id WHERE id = {message.chat.id}")
     id, f_name, s_name, age, sex, city, region, interests = cursor.fetchone()
@@ -177,8 +176,10 @@ def get_interests(message):
     cursor.execute("INSERT INTO login_id VALUES(?, ?, ?, ?, ?, ?, ?, ?);", user.get_data())
     connect.commit()
     greet_user(message)
+'''=============================='''
 
-"Edit"
+
+'''=============Edit============='''
 def edit_profile(message):
     cursor.execute(f"SELECT id, first_name, second_name, age, sex, city, region, interests FROM login_id WHERE id = {message.chat.id}")
     id, f_name, s_name, age, sex, city, region, interests = cursor.fetchone()
@@ -301,30 +302,6 @@ def back_to_edit(message):
     bot.send_message(message.chat.id, 'Хотите еще что-нибудь отредактировать?')
     bot.send_message(message.chat.id, 'И - Имя\nФ - Фамилия\nВ - Возраст\nП - Пол\nГ - Город\nИ - Интересы\nВсе - Изменить все\nН - ничего, я передумал')
     bot.register_next_step_handler(message, edit_profile)
-
-"Non bot functions"
-def delete_user(id):
-    cursor.execute(f"DELETE FROM login_id WHERE id = {id}")
-    connect.commit()
-
-def check_city(new_city):
-    with open ('russia.json', 'r', encoding='utf-8') as f:
-        cities = json.loads(f.read())
-    
-    for city in cities:
-        if city["city"] == new_city:
-            return {'city': city["city"], 'region': city["region"]}
-    return False
-
-def year_type(age):
-    if (age % 100 >= 11) and (age % 100 <= 14):
-        return 'лет'
-    elif age % 10 == 1:
-        return 'год'
-    elif age % 10 in [2, 3, 4]:
-        return 'года'
-    else:
-        return 'лет'
-
+'''=============================='''
 
 bot.polling()
