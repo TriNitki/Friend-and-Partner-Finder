@@ -1,0 +1,83 @@
+{
+  "sport": {
+    "sport_games": [
+      "volleyball",
+      "football",
+      "basketball",
+      "tennis",
+      "ping_pong",
+      "hockey",
+      "skiing",
+      "skating"
+    ],
+    "gym": [
+      "powerlifting",
+      "fitness",
+      "bodybuilding"
+    ],
+    "outside_sport": [
+      "athletics",
+      "work_out"
+    ]
+  },
+  "programming": [
+    "C++",
+    "Java",
+    "JavaScript",
+    "Ruby",
+    "PHP",
+    "C#",
+    "C",
+    "Go",
+    "1C",
+    "Python"
+  ],
+  "video_games": [
+    "shooter",
+    "quest",
+    "rogue_like",
+    "RPG",
+    "simulator",
+    "platformer",
+    "action",
+    "battle_royale",
+    "MOBA",
+    "fighting",
+    "racing",
+    "sandbox"
+  ],
+  "watch": {
+    "series": [
+      "drama",
+      "сomedy",
+      "comedy",
+      "musical",
+      "detective",
+      "action",
+      "horror",
+      "thriller",
+      "animated"
+    ],
+    "anime": [
+      "shonen",
+      "shoujo",
+      "isekai",
+      "harem",
+      "slice_of_life",
+      "seinen"
+    ],
+    "film" : [
+      "drama",
+      "сomedy",
+      "comedy",
+      "musical",
+      "detective",
+      "action",
+      "horror",
+      "thriller",
+      "animated"
+    ]
+
+  }
+}
+

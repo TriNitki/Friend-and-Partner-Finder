@@ -1,39 +1,57 @@
-import telebot
-import sqlite3
 import os
 import json
+
+import telebot
+import sqlite3
+import models
+
 from dotenv import load_dotenv
+from telebot import types
+
+from func import delete_user, check_city, year_type
+
 
 load_dotenv()
+
 
 #bot
 bot_token = os.getenv("bot_token")
 bot = telebot.TeleBot(bot_token)
 
-import models
-from func import delete_user, check_city, year_type
 
 '''========BOT==COMMANDS========'''
 "New user greet"
 @bot.message_handler(commands=['start'])
 def start(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    item1 = types.KeyboardButton("Помощь 🆘")
+    markup.add(item1)
     bot.send_message(message.chat.id, f'Привет, {message.chat.username}👋!\
-                    \nДобро пожаловать в "DetectlyBot"! Этот бот создан для поиска друзей и бизнес партнеров.')
+                    \nДобро пожаловать в "DetectlyBot"! Этот бот создан для поиска друзей и бизнес партнеров.', reply_markup=markup)
     bot.send_message(message.chat.id, 'Для начала регистрации введите команду /reg. Для полного списка возможностей введите /help.')
 
+
 "Send full list of available commands"
+
+
 @bot.message_handler(commands=['help'])
 def help(message):
-    bot.send_message(message.chat.id,    'Список комманд:')
-    bot.send_message(message.chat.id,    '/start - меню приветствия\
-                                        \n/help - полный список доступных команд\
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    item1 = types.KeyboardButton("Регистрация")
+    item2 = types.KeyboardButton("Моя анкета 👤")
+    item3 = types.KeyboardButton("Редактирование ✏")
+
+    markup.add(item1, item2, item3)
+    bot.send_message(message.chat.id,   '/help - полный список доступных команд\
                                         \n/reg - начать регистрацию\
                                         \n/edit - редактирование профиля\
                                         \n/delete - удаление профиля\
-                                        \n/me - приветствие зарегистрированного пользователя')
+                                        \n/me - приветствие зарегистрированного пользователя',
+    reply_markup=markup)
+
 
 "Commands that require db access"
-@bot.message_handler(commands=['reg', 'delete', 'me', 'edit'])
+@bot.message_handler(content_types=['text'])
 def db_req_com(message):
     global connect, cursor, user
     connect = sqlite3.connect('users.sqlite3', check_same_thread=False)
@@ -61,7 +79,7 @@ def db_req_com(message):
         id, f_name, s_name, age, sex, city, region, interests = cursor.fetchone()
         user = models.User(id, f_name, s_name, age, sex, city, region, interests)
 
-    if message.text == "/reg":
+    if message.text == "/reg" or message.text == "Регистрация":
         #register user if it isn't exist
         if data == None:
             reg_user(message)
@@ -74,22 +92,25 @@ def db_req_com(message):
         else:
             delete_user(message.chat.id)
             bot.send_message(message.chat.id, 'Пользователь был удален.\nДля повторной регистрации воспользуйтесь командой /reg.')
-    elif message.text == "/me":
+    elif message.text == "/me" or message.text == "Моя анкета 👤":
         #greet user if it is exist
         if data == None:
             bot.send_message(message.chat.id, 'Пользователь еще не создан.\nДля регистрации воспользуйтесь командой /reg')
         else:
             greet_user(message)
-    elif message.text == "/edit":
+    elif message.text == "Помощь 🆘":
+        help(message)
+    elif message.text == "/edit" or message.text == "Редактирование ✏":
         if data == None:
             bot.send_message(message.chat.id, 'Пользователь еще не создан.\nДля регистрации воспользуйтесь командой /reg')
         else:
             bot.send_message(message.chat.id, 'Напишите что хотите отредактировать:')
-            bot.send_message(message.chat.id, 'И - Имя\nФ - Фамилия\nВ - Возраст\nП - Пол\nГ - Город\nИ - Интересы\nВсе - Изменить все\nН - ничего, я передумал')
+            send_edit_massage(message)
             bot.register_next_step_handler(message, edit_profile)
+    else: non_com(message)
 
 "Default bot reply"
-@bot.message_handler(content_types=['text'])
+# @bot.message_handler(content_types=['text'])
 def non_com(message):
     bot.reply_to(message, '🤨')
     bot.send_message(message.chat.id, 'Не понял.\nДля начала регистрации введите команду /start.')
@@ -118,13 +139,13 @@ def reg_user(message):
 def get_first_name(message):
     user.first_name = message.text
     bot.send_message(message.chat.id, 'Какая у тебя будет фамилия?')
-    bot.register_next_step_handler(message, get_second_name) 
+    bot.register_next_step_handler(message, get_second_name)
 
 def get_second_name(message):
     user.second_name = message.text
     bot.send_message(message.chat.id, 'Сколько тебе лет?')
     bot.register_next_step_handler(message, get_age)
-    
+
 def get_age(message):
     if user.age == None:
         try:
@@ -185,7 +206,7 @@ def edit_profile(message):
     id, f_name, s_name, age, sex, city, region, interests = cursor.fetchone()
     user = models.User(id, f_name, s_name, age, sex, city, region, interests)
 
-    if message.text.lower() in ["и", "имя", "ф", "фамилия", "в", "возраст", "п", "пол", "г", "город", "и", "интересы", "все", "всё", "н", "ничего"]:
+    if message.text.lower() in ["и", "имя", "ф", "фамилия", "в", "возраст", "п", "пол", "г", "город", "ин", "интересы", "все", "всё", "н", "ничего", "назад ⬅️"]:
         if message.text.lower() in ["и", "имя"]:
             user.first_name = None
             bot.send_message(message.chat.id, "Какое у тебя будет имя?")
@@ -207,19 +228,21 @@ def edit_profile(message):
             user.region = None
             bot.send_message(message.chat.id, 'В каком городе ты живешь?')
             bot.register_next_step_handler(message, edit_city)
-        elif message.text.lower() in ["и", "интересы"]:
+        elif message.text.lower() in ["ин", "интересы"]:
             user.interests = None
             bot.register_next_step_handler(message, edit_interests)
         elif message.text.lower() in ["все", "всё"]:
+            delete_user(message.chat.id)
             user = models.User(message.chat.id)
             bot.register_next_step_handler(message, reg_user)
-        elif message.text.lower() in ["н", "ничего"]:
+        elif message.text.lower() in ["н", "ничего", "назад ⬅️"]:
             greet_user(message)
             return
     else:
         bot.reply_to(message, "Такого я не знаю.")
         bot.send_message(message.chat.id, 'Напишите что хотите отредактировать.')
-        bot.send_message(message.chat.id, 'И - Имя\nФ - Фамилия\nВ - Возраст\nП - Пол\nГ - Город\nИ - Интересы\nВсе - Изменить все\nН - ничего, я передумал')
+        send_edit_massage(message)
+
 
 def edit_first_name(message):
     user.first_name = message.text
@@ -300,8 +323,39 @@ def edit_interests(message):
 
 def back_to_edit(message):
     bot.send_message(message.chat.id, 'Хотите еще что-нибудь отредактировать?')
-    bot.send_message(message.chat.id, 'И - Имя\nФ - Фамилия\nВ - Возраст\nП - Пол\nГ - Город\nИ - Интересы\nВсе - Изменить все\nН - ничего, я передумал')
+    send_edit_massage(message)
     bot.register_next_step_handler(message, edit_profile)
 '''=============================='''
+
+
+def send_edit_massage(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    item1 = types.KeyboardButton("Имя")
+    item2 = types.KeyboardButton("Фамилия")
+    item3 = types.KeyboardButton("Возраст")
+    item4 = types.KeyboardButton("Пол")
+    item5 = types.KeyboardButton("Город")
+    item6 = types.KeyboardButton("Интересы")
+    item7 = types.KeyboardButton("Изменить все")
+    item8 = types.KeyboardButton("Назад ⬅️")
+
+    markup.add(item1, item2, item3, item4, item5, item6, item7, item8)
+
+    bot.send_message(message.chat.id,
+                     'И - Имя\
+                     \nФ - Фамилия\
+                     \nВ - Возраст\
+                     \nП - Пол\
+                     \nГ - Город\
+                     \nИн - Интересы\
+                     \nВсе - Изменить все\
+                     \nН - Назад',
+                     reply_markup=markup)
+
+
+# @bot.message_handler(content_types=['text'])
+# def main(message):
+#     if message.text == 'Help':
+
 
 bot.polling()
