@@ -21,63 +21,60 @@
     ]
   },
   "programming": [
-    "C++",
-    "Java",
-    "JavaScript",
-    "Ruby",
-    "PHP",
-    "C#",
-    "C",
-    "Go",
-    "1C",
-    "Python"
+    "c++",
+    "java",
+    "javaScript",
+    "ruby",
+    "php",
+    "c#",
+    "c",
+    "go",
+    "1c",
+    "python"
   ],
   "video_games": [
     "shooter",
     "quest",
     "rogue_like",
-    "RPG",
+    "rpg",
     "simulator",
     "platformer",
     "action",
     "battle_royale",
-    "MOBA",
+    "moba",
     "fighting",
     "racing",
     "sandbox"
   ],
-  "watch": {
-    "series": [
-      "drama",
-      "сomedy",
-      "comedy",
-      "musical",
-      "detective",
-      "action",
-      "horror",
-      "thriller",
-      "animated"
-    ],
-    "anime": [
-      "shonen",
-      "shoujo",
-      "isekai",
-      "harem",
-      "slice_of_life",
-      "seinen"
-    ],
-    "film" : [
-      "drama",
-      "сomedy",
-      "comedy",
-      "musical",
-      "detective",
-      "action",
-      "horror",
-      "thriller",
-      "animated"
-    ]
-
-  }
+  "series": [
+    "drama",
+    "сomedy",
+    "comedy",
+    "musical",
+    "detective",
+    "action",
+    "horror",
+    "thriller",
+    "animated"
+  ],
+  "anime": [
+    "shonen",
+    "shoujo",
+    "isekai",
+    "harem",
+    "slice_of_life",
+    "seinen"
+  ],
+  "film" : [
+    "drama",
+    "сomedy",
+    "comedy",
+    "musical",
+    "detective",
+    "action",
+    "horror",
+    "thriller",
+    "animated"
+  ]
 }
 

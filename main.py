@@ -191,12 +191,26 @@ def reg_user(message):
     bot.register_next_step_handler(message, get_first_name)
 
 def get_first_name(message):
-    user.first_name = message.text
+    try:
+        user.first_name = message.text
+    except:
+        bot.reply_to(message, 'Неверное значение. Попробуйте ввести что-нибудь другое.')
+        bot.send_message(message.chat.id, "Какое у тебя будет имя?")
+        bot.register_next_step_handler(message, get_first_name)
+        return
+
     bot.send_message(message.chat.id, 'Какая у тебя будет фамилия?')
     bot.register_next_step_handler(message, get_second_name)
 
 def get_second_name(message):
-    user.second_name = message.text
+    try:
+        user.second_name = message.text
+    except:
+        bot.reply_to(message, 'Неверное значение. Попробуйте ввести что-нибудь другое.')
+        bot.send_message(message.chat.id, "Какая у тебя будет фамилия?")
+        bot.register_next_step_handler(message, get_age)
+        return
+    
     bot.send_message(message.chat.id, 'Сколько тебе лет?')
     bot.register_next_step_handler(message, get_age)
 
@@ -214,42 +228,62 @@ def get_age(message):
 
 def get_sex(message):
     markup = get_menu(message, type = "sex")
-    if message.text.lower() in ['м', 'мужской', 'муж', 'мужик', 'm', 'man', 'я парень 👨']:
-        user.sex = 'm'
-    elif message.text.lower() in ['ж', 'женский', 'жен', 'девушка', 'женщина', 'w', 'woman', 'я девушка 👩‍🦰']:
-        user.sex = 'w'
-    elif message.text.lower() in ['п', 'пропустить', 'прапустить', 'не', 'нет', 'u', 'undef', 'undefined', "attack helicopter 🚁"]:
-        user.sex = 'undef'
-    else:
-        bot.reply_to(message, 'Прости, но такого пола я не знаю. Вот какие я знаю:', reply_markup=markup)
-        bot.send_message(message.chat.id, 'М - мужской\
-                         \nЖ - женский\
-                         \nП - пропустить этот вопрос')
+    try:
+        if message.text.lower() in ['м', 'мужской', 'муж', 'мужик', 'm', 'man', 'я парень 👨']:
+            user.sex = 'm'
+        elif message.text.lower() in ['ж', 'женский', 'жен', 'девушка', 'женщина', 'w', 'woman', 'я девушка 👩‍🦰']:
+            user.sex = 'w'
+        elif message.text.lower() in ['п', 'пропустить', 'прапустить', 'не', 'нет', 'u', 'undef', 'undefined', "attack helicopter 🚁"]:
+            user.sex = 'undef'
+        else:
+            bot.reply_to(message, 'Прости, но такого пола я не знаю. Вот какие я знаю:', reply_markup=markup)
+            bot.send_message(message.chat.id, 'М - мужской\
+                            \nЖ - женский\
+                            \nП - пропустить этот вопрос')
+            bot.register_next_step_handler(message, get_sex)
+            return
+    except:
+        bot.reply_to(message, 'Неверное значение. Попробуйте ввести что-нибудь другое.')
+        bot.send_message(message.chat.id, "Какого ты пола?", reply_markup=markup)
         bot.register_next_step_handler(message, get_sex)
         return
+    
     markup = types.ReplyKeyboardRemove()
     bot.send_message(message.chat.id, 'В каком городе ты живешь?', reply_markup=markup)
     bot.register_next_step_handler(message, get_city)
 
 def get_city(message):
-    new_city = check_city(message.text.title())
-    if new_city:
-        user.city = new_city["city"]
-        user.region = new_city["region"]
-    elif message.text.lower() == 'п':
-        user.city = 'undef'
-        user.region = 'undef'
-    else:
-        bot.reply_to(message, 'Прости, но такого города я не знаю.\nПопробуй ввести его еще раз или напиши "П" для пропуска вопроса.')
+    try:
+        new_city = check_city(message.text.title())
+        if new_city:
+            user.city = new_city["city"]
+            user.region = new_city["region"]
+        elif message.text.lower() == 'п':
+            user.city = 'undef'
+            user.region = 'undef'
+        else:
+            bot.reply_to(message, 'Прости, но такого города я не знаю.\nПопробуй ввести его еще раз или напиши "П" для пропуска вопроса.')
+            bot.register_next_step_handler(message, get_city)
+            return
+    except:
+        bot.reply_to(message, 'Неверное значение. Попробуйте ввести что-нибудь другое.')
+        bot.send_message(message.chat.id, "В каком городе ты живешь?")
         bot.register_next_step_handler(message, get_city)
         return
-
+    
     bot.send_message(message.chat.id, 'Перечисли свои интересы через запятую.')
     bot.register_next_step_handler(message, get_interests)
 
 def get_interests(message):
-    interests = [item.strip() for item in message.text.lower().split(',')]
-    user.interests = json.dumps(interests, indent=4, ensure_ascii=False)
+    try:
+        interests = [item.strip() for item in message.text.lower().split(',')]
+        user.interests = json.dumps(interests, indent=4, ensure_ascii=False)
+    except:
+        bot.reply_to(message, 'Неверное значение. Попробуйте ввести что-нибудь другое.')
+        bot.send_message(message.chat.id, "Перечисли свои интересы через запятую.")
+        bot.register_next_step_handler(message, get_interests)
+        return
+    
     cursor.execute("INSERT INTO login_id VALUES(?, ?, ?, ?, ?, ?, ?, ?);", user.get_data())
     connect.commit()
     greet_user(message)
@@ -289,7 +323,13 @@ def edit_profile(message):
         bot.send_message(message.chat.id, 'Что Вы хотите отредактировать?', reply_markup=markup)
 
 def edit_first_name(message):
-    user.first_name = message.text
+    try:
+        user.first_name = message.text
+    except:
+        bot.reply_to(message, 'Неверное значение. Попробуйте ввести что-нибудь другое.')
+        bot.send_message(message.chat.id, "Какое у тебя будет имя?")
+        bot.register_next_step_handler(message, edit_first_name)
+        return
     delete_user(message.chat.id)
     cursor.execute("INSERT INTO login_id VALUES(?, ?, ?, ?, ?, ?, ?, ?);", user.get_data())
     connect.commit()
@@ -297,7 +337,13 @@ def edit_first_name(message):
     back_to_edit(message)
 
 def edit_second_name(message):
-    user.second_name = message.text
+    try:
+        user.second_name = message.text
+    except:
+        bot.reply_to(message, 'Неверное значение. Попробуйте ввести что-нибудь другое.')
+        bot.send_message(message.chat.id, 'Какая у тебя будет фамилия?')
+        bot.register_next_step_handler(message, edit_second_name)
+        return
     delete_user(message.chat.id)
     cursor.execute("INSERT INTO login_id VALUES(?, ?, ?, ?, ?, ?, ?, ?);", user.get_data())
     connect.commit()
@@ -347,7 +393,7 @@ def edit_city(message):
         user.region = 'undef'
     else:
         bot.reply_to(message, 'Прости, но такого города я не знаю.\nПопробуй ввести его еще раз или напиши "П" для пропуска вопроса.')
-        bot.register_next_step_handler(message, get_city)
+        bot.register_next_step_handler(message, edit_city)
         return
     delete_user(message.chat.id)
     cursor.execute("INSERT INTO login_id VALUES(?, ?, ?, ?, ?, ?, ?, ?);", user.get_data())
@@ -356,8 +402,14 @@ def edit_city(message):
     back_to_edit(message)
 
 def edit_interests(message):
-    interests = [item.strip() for item in message.text.lower().split(',')]
-    user.interests = json.dumps(interests, indent=4, ensure_ascii=False)
+    try:
+        interests = [item.strip() for item in message.text.lower().split(',')]
+        user.interests = json.dumps(interests, indent=4, ensure_ascii=False)
+    except:
+        bot.reply_to(message, 'Неверное значение. Попробуйте ввести что-нибудь другое.')
+        bot.send_message(message.chat.id, 'Перечисли интересы через запятую.')
+        bot.register_next_step_handler(message, edit_interests)
+        return
     delete_user(message.chat.id)
     cursor.execute("INSERT INTO login_id VALUES(?, ?, ?, ?, ?, ?, ?, ?);", user.get_data())
     connect.commit()
